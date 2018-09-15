@@ -23,7 +23,19 @@ public class Place{
             if (!gpsEnabled) {
                 // Build an alert dialog here that requests that the user enable
                 // the location services, then when the user clicks the "OK" button,
-                // call enableLocationSettings()
+                AlertDialog.Builder enableLocation = new AlertDialog.Builder(get(Activity()));
+                enableLocation.setMessage("Location services not currently enabled. Enable?");
+                enableLocation.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        enableLocationSettings();
+                    }
+                });
+                enableLocation.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+
+                    }
+                });
+                AlertDialog dialog = enableLocation.create();
             }
         }
 
