@@ -3,6 +3,8 @@ import android.content.Context;
 import android.location.Location;
 import android.location.LocationManager;
 import android.location.LocationProvider;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 
 public class Place{
     LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
@@ -12,17 +14,11 @@ public class Place{
     public static void Run() {
         protected void onStart () {
             super.onStart();
-
-            // This verification should be done during onStart() because the system calls
-            // this method when the user returns to the activity, which ensures the desired
-            // location provider is enabled each time the activity resumes from the stopped state.
             LocationManager locationManager =
                     (LocationManager).getSystemService(Context.LOCATION_SERVICE);
             final boolean gpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
 
             if (!gpsEnabled) {
-                // Build an alert dialog here that requests that the user enable
-                // the location services, then when the user clicks the "OK" button,
                 AlertDialog.Builder enableLocation = new AlertDialog.Builder(get(Activity()));
                 enableLocation.setMessage("Location services not currently enabled. Enable?");
                 enableLocation.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
@@ -32,10 +28,11 @@ public class Place{
                 });
                 enableLocation.setNegativeButton("No", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-
+                        dialog.cancel();
                     }
                 });
                 AlertDialog dialog = enableLocation.create();
+                dialog.show();
             }
         }
 
