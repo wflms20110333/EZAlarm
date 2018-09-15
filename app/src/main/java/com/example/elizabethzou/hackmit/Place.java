@@ -24,6 +24,7 @@ public class Place{
                 enableLocation.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         activity.startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                        dialog.dismiss();
                     }
                 });
                 enableLocation.setNegativeButton("No", new DialogInterface.OnClickListener() {
