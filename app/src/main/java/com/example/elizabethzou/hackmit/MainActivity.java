@@ -12,10 +12,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
-import android.location.Location;
-import android.location.LocationManager;
-import android.location.LocationProvider;
-import android.location.LocationListener;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -98,6 +94,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             return title + ": " + start;
         }
     }
+
+    /*
     private final LocationListener listener = new LocationListener() {
 
         @Override
@@ -113,4 +111,5 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     };
 
     LocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000000, 100, listener);
+    */
 }
