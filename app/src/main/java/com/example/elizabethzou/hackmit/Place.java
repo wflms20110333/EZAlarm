@@ -12,7 +12,7 @@ public class Place{
 
 
     public static void Run() {
-        protected void onStart () {
+        protected void onStart() {
             super.onStart();
             LocationManager locationManager =
                     (LocationManager).getSystemService(Context.LOCATION_SERVICE);
@@ -23,7 +23,7 @@ public class Place{
                 enableLocation.setMessage("Location services not currently enabled. Enable?");
                 enableLocation.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        enableLocationSettings();
+                        activity.startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
                     }
                 });
                 enableLocation.setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -36,7 +36,7 @@ public class Place{
             }
         }
 
-        private void enableLocationSettings () {
+        private void enableLocationSettings() {
             Intent settingsIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
             startActivity(settingsIntent);
         }
