@@ -5,7 +5,6 @@ import android.location.LocationManager;
 import android.location.LocationProvider;
 
 public class Place{
-    public static final String NETWORK_PROVIDER;
     LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
     LocationProvider provider = locationManager.getProvider(LocationManager.GPS_PROVIDER);
 

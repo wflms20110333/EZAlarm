@@ -11,6 +11,10 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
+import android.location.Location;
+import android.location.LocationManager;
+import android.location.LocationProvider;
+import android.location.LocationListener;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -57,4 +61,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
         }
     }
+
+    private final LocationListener listener = new LocationListener() {
+
+        @Override
+        public void onLocationChanged(Location location) {
+            // A new location update is received.  Do something useful with it.  In this case,
+            // we're sending the update to a handler which then updates the UI with the new
+            // location.
+            Message.obtain(mHandler,
+                    UPDATE_LATLNG,
+                    location.getLatitude() + ", " +
+                            location.getLongitude()).sendToTarget();
+        }
+    };
+
+    LocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000000, 100, listener);
 }
