@@ -23,7 +23,8 @@ public class Place{
                 enableLocation.setMessage("Location services not currently enabled. Enable?");
                 enableLocation.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        activity.startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+//help I don't know how activities work
+                        startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
                         dialog.dismiss();
                     }
                 });
@@ -36,12 +37,9 @@ public class Place{
                 dialog.show();
             }
         }
-
-        private void enableLocationSettings() {
-            Intent settingsIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-            startActivity(settingsIntent);
-        }
     }
+
+    //Location should be enabled now
 
     private final LocationListener listener = new LocationListener() {
 
