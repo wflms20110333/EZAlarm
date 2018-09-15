@@ -22,9 +22,9 @@ import static android.provider.AlarmClock.ACTION_SET_ALARM;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
-    Button button;
-    Button button2;
+    Button button; //button for calender
     Cursor cursor;
+    Button button2; //button for alarm
     Long time = null; //time for earliest event
     Long prelay = new Long("18000000"); //default morning routine time
 
