@@ -1,9 +1,11 @@
 package com.example.elizabethzou.hackmit;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.provider.AlarmClock;
 import android.provider.CalendarContract;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -12,11 +14,13 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import static android.provider.AlarmClock.ACTION_SET_ALARM;
+
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     Button button;
     Cursor cursor;
-
+    String time;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,13 +52,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         String descriptionValue = cursor.getString(id_3);
                         String eventValue = cursor.getString(id_4);
                         String startValue = cursor.getString(id_5);
+                        time = startValue;
                         String endValue = cursor.getString(id_6);
-                        Toast.makeText(this, idValue + ", " + titleValue + ", " + descriptionValue + ", " + eventValue, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, time, Toast.LENGTH_SHORT).show();
                     } else {
                         Toast.makeText(this, "Event is not present.", Toast.LENGTH_SHORT).show();
                     }
                 }
                 break;
+            case R.id.button2:
+                Boolean canRead = ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_CALENDAR) != PackageManager.PERMISSION_GRANTED;
+                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_CALENDAR) != PackageManager.PERMISSION_GRANTED) {
+                    Log.i("didnotpasstest", "rip");
+                    return;
+                }
+                Log.i("passedTest", "hey");
+                Intent setAlarm = new Intent();
+                setAlarm.setAction(ACTION_SET_ALARM);
+                setAlarm.setData(null);
+                setAlarm.putExtra(AlarmClock.EXTRA_HOUR, 1);
+                setAlarm.putExtra(AlarmClock.EXTRA_IS_PM, false);
+                startActivity(setAlarm);
         }
     }
 }
