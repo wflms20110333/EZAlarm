@@ -14,6 +14,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+
 import static android.provider.AlarmClock.ACTION_SET_ALARM;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
@@ -21,13 +25,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     Button button;
     Button button2;
     Cursor cursor;
-    String time = new String();
+    Long time = null; //time for earliest event
+    Long prelay = new Long("18000000"); //default morning routine time
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         button = (Button) findViewById(R.id.button);
         button.setOnClickListener(this);
+        button2 = (Button) findViewById(R.id.button2);
+        button2.setOnClickListener(this);
     }
 
     @Override
@@ -53,28 +61,38 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         String descriptionValue = cursor.getString(id_3);
                         String eventValue = cursor.getString(id_4);
                         String startValue = cursor.getString(id_5);
-                        time = startValue;
+                        time = Long.parseLong(startValue);
                         String endValue = cursor.getString(id_6);
-                        Toast.makeText(this, time, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, startValue, Toast.LENGTH_SHORT).show();
                     } else {
                         Toast.makeText(this, "Event is not present.", Toast.LENGTH_SHORT).show();
                     }
                 }
                 break;
+
             case R.id.button2:
-                Boolean canRead = ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_CALENDAR) != PackageManager.PERMISSION_GRANTED;
-                Boolean calenderSet = time.length() == 0;
-                if (canRead || calenderSet) {
+                Boolean permission = ActivityCompat.checkSelfPermission(this, Manifest.permission.SET_ALARM) != PackageManager.PERMISSION_GRANTED;
+                Boolean calenderSet = time == null;
+                if (permission || calenderSet) {
                     Log.i("didnotpasstest", "rip");
                     return;
                 }
-                Log.i("passedTest", "hey");
+                Log.i("passedTest", "Setting Alarm");
                 Intent setAlarm = new Intent();
+                //setAlarm;
                 setAlarm.setAction(ACTION_SET_ALARM);
                 setAlarm.setData(null);
-                setAlarm.putExtra(AlarmClock.EXTRA_HOUR, 1);
+                //don't show UI
+                setAlarm.putExtra(AlarmClock.EXTRA_SKIP_UI, true);
+                //calculate Date
+                Calendar calendar = new GregorianCalendar();
+                calendar.setTimeInMillis(time - prelay);
+                setAlarm.putExtra(AlarmClock.EXTRA_HOUR, calendar.HOUR);
+                setAlarm.putExtra(AlarmClock.EXTRA_MINUTES, calendar.MINUTE);
+                //in the morning;
                 setAlarm.putExtra(AlarmClock.EXTRA_IS_PM, false);
                 startActivity(setAlarm);
+                break;
         }
     }
 }
