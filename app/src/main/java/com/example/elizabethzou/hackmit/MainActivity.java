@@ -19,8 +19,9 @@ import static android.provider.AlarmClock.ACTION_SET_ALARM;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     Button button;
+    Button button2;
     Cursor cursor;
-    String time;
+    String time = new String();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,7 +63,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.button2:
                 Boolean canRead = ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_CALENDAR) != PackageManager.PERMISSION_GRANTED;
-                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_CALENDAR) != PackageManager.PERMISSION_GRANTED) {
+                Boolean calenderSet = time.length() == 0;
+                if (canRead || calenderSet) {
                     Log.i("didnotpasstest", "rip");
                     return;
                 }
