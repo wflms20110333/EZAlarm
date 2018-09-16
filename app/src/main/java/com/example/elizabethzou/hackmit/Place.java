@@ -24,7 +24,7 @@ public class Place{
                 enableLocation.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
 //help I don't know how activities work
-                        startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                        activity.startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
                         dialog.dismiss();
                     }
                 });
