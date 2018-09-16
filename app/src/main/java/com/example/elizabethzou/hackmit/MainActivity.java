@@ -22,6 +22,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -104,6 +105,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         time = calculateTime(Long.parseLong(startValue));
                         String endValue = cursor.getString(id_6);
                         Toast.makeText(this, startValue, Toast.LENGTH_SHORT).show();
+                        setAlarm(titleValue, time);
                         //String descriptionValue = cursor.getString(id_3);
                         //String eventValue = cursor.getString(id_4);
                         Date startValue = new Date(Long.parseLong(cursor.getString(id_5)));
@@ -120,9 +122,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
                 Log.i("rip", "lol " + events);
                 break;
-
-            case R.id.button2:
-                setAlarm(time);
         }
     }
     //-------------------------FILE COMPONENTS--------------------------
@@ -131,10 +130,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         String title;
         Long millis;
         String valid;
-        public Record(String title, Long millis)
-        {
+        public Record(String title, Long millis) {
             this.title = title.replaceAll(" ", "_"); //erase spaces to avoid trouble
             this.millis = millis;
+        }
+        @Override
+        public String toString()
+        {
+            return title + " " + millis.toString();
         }
     }
 
@@ -142,14 +145,35 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     {
         try
         {
-            osw.write(r.title + " " + r.millis.toString() + " " + "Y" + "\n");
+            PrintWriter pt = new PrintWriter(file);
+            pt.write(r.title + " " + r.millis.toString());
+            pt.close(); //print new records& erase existing ones
         }
         catch (Exception e)
         {
             //TODO: push error message
         }
     }
-
+    public Long eraseAll()
+    {
+        try
+        {
+            FileInputStream fIn = openFileInput(filename);
+            isr = new InputStreamReader(fIn);
+            BufferedReader in = new BufferedReader(isr);
+            String str;
+            while ((str = in.readLine()) != null)  //read until EOF
+            {
+                String[] str1 = str.split(" ");
+                eraseAlarm(str1[1]);
+            }
+        }
+        catch (Exception e)
+        {
+            //TODO: push error message
+        } 
+    }
+    //API for Elizabeth
     public Long retrieveTime(String title)  {
         try
         {
@@ -157,13 +181,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             FileInputStream fIn = openFileInput(filename);
             isr = new InputStreamReader(fIn);
             BufferedReader in = new BufferedReader(isr);
-            String str = new String();
+            String str;
             while ((str = in.readLine()) != null)  //read until EOF
             {
                  String[] str1 = str.split(" ");
                  if (str1[0].equals(goal))
                  {
-                     return Long.parseLong(str1[1])
+                     return Long.parseLong(str1[1]);
                  }
             }
         }
@@ -179,6 +203,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return time - prelay; //TODO: discretion
     }
 
+    public void eraseAlarm(String title)
+    {
+        eraseAlarm(retrieveTime(title));
+    }
     //erase alarm given time
     public void eraseAlarm(Long millis)  {
         Boolean permission = ActivityCompat.checkSelfPermission(this, Manifest.permission.SET_ALARM) != PackageManager.PERMISSION_GRANTED;
@@ -197,16 +225,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         startActivity(eraseAlarm);
     }
 
+
     //setAlarm
-    public void setAlarm(Long millis)
+    public void setAlarm(String title, Long millis)
     {
+        eraseAll();
         Boolean permission = ActivityCompat.checkSelfPermission(this, Manifest.permission.SET_ALARM) != PackageManager.PERMISSION_GRANTED;
         Boolean calenderSet = time == null;
         if (permission || calenderSet) {
             Log.i("didnotpasstest", "rip");
             return;
         }
-        //TODO:search for existing alarm
         Log.i("passedTest", "Setting Alarm");
         Intent setAlarm = new Intent();
         //setAlarm;
@@ -222,8 +251,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //in the morning;
         setAlarm.putExtra(AlarmClock.EXTRA_IS_PM, false);
         startActivity(setAlarm);
-        return;
-
+        //put record
+        Record rc = new Record(title, millis);
+        putRecord(rc);
     }
     public static class CalEvent
     {
