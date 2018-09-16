@@ -65,6 +65,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         findViewById(R.id.button).setOnClickListener(this);
         findViewById(R.id.button2).setOnClickListener(this);
         findViewById(R.id.submit).setOnClickListener(this);
@@ -343,7 +344,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             arg += "+" + arr[i];
         }
-        long startTime = getTravelTime(latitude, longitude, arg, arrivalTime) * MILLISECONDS_PER_SECOND;
+        Log.i("setAlarmDest", "rip  " + destination + ", " + arg);
+        long startTime = arrivalTime - getTravelTime(latitude, longitude, arg, arrivalTime) * MILLISECONDS_PER_SECOND;
         startTime -= prelay;
         time = startTime;
         makeAlarm(title, startTime);
@@ -388,15 +390,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setAlarm.putExtra(AlarmClock.EXTRA_SKIP_UI, true);
         //calculate Date
         Calendar calendar = new GregorianCalendar();
+
         calendar.setTimeInMillis(millis);
+        Log.i("Calendar", calendar.HOUR + ", " + calendar.MINUTE);
         setAlarm.putExtra(AlarmClock.EXTRA_HOUR, calendar.HOUR);
         setAlarm.putExtra(AlarmClock.EXTRA_MINUTES, calendar.MINUTE);
         //in the morning;
-        setAlarm.putExtra(AlarmClock.EXTRA_IS_PM, false);
+        setAlarm.putExtra(AlarmClock.EXTRA_IS_PM, calendar.AM_PM != 0);
         Record rc = new Record(title, millis);
         startActivity(setAlarm);
-
-        if (toKill != null && !toKill.equals(millis))
+        if (toKill != null && toKill > 0 && !toKill.equals(millis))
         {
             Log.i("???", ((Long)(millis - toKill)).toString());
             eraseAlarm = new Intent();
@@ -409,6 +412,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             eraseAlarm.putExtra(AlarmClock.EXTRA_SKIP_UI, true);
             startActivity(eraseAlarm);
         }
+
         //put record
         try {
             wait(1000);
@@ -416,6 +420,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         catch (Exception e){}
         putRecord(rc);
     }
+
 
     //-------------------------HTTP REQUEST COMPONENTS-------------------------
     String filename2 = Environment.getExternalStoragePublicDirectory(DIRECTORY_DOWNLOADS)+"/Elizabeth_bot2.txt";
@@ -486,6 +491,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             while (newstr.charAt(i) < '0' || newstr.charAt(i) > '9') i++;
             int j = i;
             while (newstr.charAt(j) >= '0' && newstr.charAt(j) <= '9') j++;
+            Log.i("666",newstr.substring(i,j));
             return Integer.parseInt(newstr.substring(i,j));
         }
         catch (Exception e) {
