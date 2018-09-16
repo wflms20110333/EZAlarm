@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">HackMIT</string>
+    <string name="title_activity_look_up_calendar">LookUpCalendar</string>
 </resources>
