@@ -1,10 +1,12 @@
 package com.example.elizabethzou.hackmit;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.AlarmClock;
 import android.provider.CalendarContract;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -14,6 +16,11 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+
+import static android.provider.AlarmClock.ACTION_SET_ALARM;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -21,6 +28,10 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     Button button;
+    Cursor cursor;
+    Button button2; //button for alarm
+    Long time = null; //time for earliest event
+    Long prelay = new Long("18000000"); //default morning routine time
     List<CalEvent> events;
 
     @Override
@@ -29,6 +40,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
         button = (Button) findViewById(R.id.button);
         button.setOnClickListener(this);
+        button2 = (Button) findViewById(R.id.button2);
+        button2.setOnClickListener(this);
+        //erase existing
     }
 
     @Override
@@ -71,6 +85,30 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     }
                 }
                 Log.i("rip", "lol " + events);
+                break;
+
+            case R.id.button2:
+                Boolean permission = ActivityCompat.checkSelfPermission(this, Manifest.permission.SET_ALARM) != PackageManager.PERMISSION_GRANTED;
+                Boolean calenderSet = time == null;
+                if (permission || calenderSet) {
+                    Log.i("didnotpasstest", "rip");
+                    return;
+                }
+                Log.i("passedTest", "Setting Alarm");
+                Intent setAlarm = new Intent();
+                //setAlarm;
+                setAlarm.setAction(ACTION_SET_ALARM);
+                setAlarm.setData(null);
+                //don't show UI
+                setAlarm.putExtra(AlarmClock.EXTRA_SKIP_UI, true);
+                //calculate Date
+                Calendar calendar = new GregorianCalendar();
+                calendar.setTimeInMillis(time - prelay);
+                setAlarm.putExtra(AlarmClock.EXTRA_HOUR, calendar.HOUR);
+                setAlarm.putExtra(AlarmClock.EXTRA_MINUTES, calendar.MINUTE);
+                //in the morning;
+                setAlarm.putExtra(AlarmClock.EXTRA_IS_PM, false);
+                startActivity(setAlarm);
                 break;
         }
     }
