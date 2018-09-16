@@ -7,6 +7,8 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.support.v4.app.FragmentActivity;
 
+/*
+public class Place{
 public class Place extends FragmentActivity{
     // public static void Run() {
     LocationManager locationManager;
@@ -53,6 +55,6 @@ public class Place extends FragmentActivity{
                             location.getLongitude()).sendToTarget();
         }
     };
-
     locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000000, 100, listener);
 }
+*/
