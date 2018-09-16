@@ -1,9 +1,13 @@
 package com.example.elizabethzou.hackmit;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.AlarmClock;
@@ -14,6 +18,7 @@ import android.text.format.Time;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -23,12 +28,21 @@ import java.util.List;
 
 import static android.provider.AlarmClock.ACTION_SET_ALARM;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, LocationListener {
 
     public static long MILLISECONDS_PER_DAY = 86400000L;
     Button button2; //button for alarm
     Long time = null; //time for earliest event
     Long prelay = new Long("18000000"); //default morning routine time
+
+    protected LocationManager locationManager;
+    protected LocationListener locationListener;
+    protected Context context;
+    //TextView txtLat;
+    //String lat;
+    //String provider;
+    protected double latitude, longitude;
+    //protected boolean gps_enabled, network_enabled;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +52,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         button2 = (Button) findViewById(R.id.button2);
         button2.setOnClickListener(this);
         //erase existing
+
+        //txtLat = (TextView) findViewById(R.id.textview1);
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        else {
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
+        }
     }
 
     /**
@@ -74,7 +97,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         }
         Collections.sort(events);
-        //Log.i("rip", "lol " + events);
+        Log.i("rip", "lol " + events);
         return events.isEmpty() ? null: events.get(0);
     }
 
@@ -149,5 +172,28 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         {
             return this.start - o.start;
         }
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        latitude = location.getLatitude();
+        longitude = location.getLongitude();
+        TextView txtLat = (TextView) findViewById(R.id.textview1);
+        txtLat.setText("Latitude:" + latitude + ", Longitude:" + longitude);
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+        Log.d("Latitude","disable");
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+        Log.d("Latitude","enable");
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+        Log.d("Latitude","status");
     }
 }
