@@ -353,7 +353,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         //postponed
     }
-    
+
     //setAlarm
     public void makeAlarm(String title, Long millis)
     {
