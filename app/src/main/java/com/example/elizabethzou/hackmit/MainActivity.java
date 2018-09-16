@@ -148,6 +148,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    /**
+     * Represents a Calendar Event, storing the title, start minute, and location.
+     */
     public static class CalEvent implements Comparable<CalEvent>
     {
         String title;
