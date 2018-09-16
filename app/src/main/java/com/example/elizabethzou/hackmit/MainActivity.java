@@ -11,10 +11,16 @@ import android.provider.CalendarContract;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Display;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -32,6 +38,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     Long time = null; //time for earliest event
     Long prelay = new Long("18000000"); //default morning routine time
     List<CalEvent> events;
+    String filename = "Elizabeth_bot.txt";
+    File file = new File(filename);
+    OutputStreamWriter osw;
+    InputStreamReader isr;  //file stuff
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,7 +51,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         button.setOnClickListener(this);
         button2 = (Button) findViewById(R.id.button2);
         button2.setOnClickListener(this);
-        //erase existing
+        //initialize file;
+        try  {
+            if (!file.exists())  {
+                Boolean bool = file.createNewFile();
+                if (!bool) throw new Exception("File Creation Fail");
+            }
+            FileOutputStream fOut = openFileOutput(filename, MODE_PRIVATE);
+            osw = new OutputStreamWriter(fOut);
+            FileInputStream fIn = openFileInput(filename);
+            isr = new InputStreamReader(fIn);
+            //TODO: remove set alarm;
+        }
+        catch (Exception e)  {
+            //TODO: push appropriate alarm message;
+            break;
+        }
     }
 
     @Override
@@ -63,7 +88,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         String title = cursor.getString(id_1);
                         Date start = new Date(Long.parseLong(cursor.getString(id_2)));
                         events.add(new CalEvent(title, start));
-                        /*
+
                         //int id_1 = cursor.getColumnIndex(CalendarContract.Events._ID);
                         int id_2 = cursor.getColumnIndex(CalendarContract.Events.TITLE);
                         //int id_3 = cursor.getColumnIndex(CalendarContract.Events.DESCRIPTION);
@@ -87,7 +112,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         //Log.i("title", "lol " + titleValue);
                         //Log.i("dtstart", "lol " + startValue);
                         //Log.i("dtend", "lol " + endValue);
-                        */
+
                     } else {
                         Toast.makeText(this, "Event is not present.", Toast.LENGTH_SHORT).show();
                     }
@@ -96,31 +121,39 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
 
             case R.id.button2:
-                Boolean permission = ActivityCompat.checkSelfPermission(this, Manifest.permission.SET_ALARM) != PackageManager.PERMISSION_GRANTED;
-                Boolean calenderSet = time == null;
-                if (permission || calenderSet) {
-                    Log.i("didnotpasstest", "rip");
-                    return;
-                }
-                Log.i("passedTest", "Setting Alarm");
-                Intent setAlarm = new Intent();
-                //setAlarm;
-                setAlarm.setAction(ACTION_SET_ALARM);
-                setAlarm.setData(null);
-                //don't show UI
-                setAlarm.putExtra(AlarmClock.EXTRA_SKIP_UI, true);
-                //calculate Date
-                Calendar calendar = new GregorianCalendar();
-                calendar.setTimeInMillis(time - prelay);
-                setAlarm.putExtra(AlarmClock.EXTRA_HOUR, calendar.HOUR);
-                setAlarm.putExtra(AlarmClock.EXTRA_MINUTES, calendar.MINUTE);
-                //in the morning;
-                setAlarm.putExtra(AlarmClock.EXTRA_IS_PM, false);
-                startActivity(setAlarm);
-                break;
+                setAlarm(time - prelay);
         }
     }
+    public class Message
+    {
+        
+    }
+    public void setAlarm(Long millis)
+    {
+        Boolean permission = ActivityCompat.checkSelfPermission(this, Manifest.permission.SET_ALARM) != PackageManager.PERMISSION_GRANTED;
+        Boolean calenderSet = time == null;
+        if (permission || calenderSet) {
+            Log.i("didnotpasstest", "rip");
+            return;
+        }
+        Log.i("passedTest", "Setting Alarm");
+        Intent setAlarm = new Intent();
+        //setAlarm;
+        setAlarm.setAction(ACTION_SET_ALARM);
+        setAlarm.setData(null);
+        //don't show UI
+        setAlarm.putExtra(AlarmClock.EXTRA_SKIP_UI, true);
+        //calculate Date
+        Calendar calendar = new GregorianCalendar();
+        calendar.setTimeInMillis(millis);
+        setAlarm.putExtra(AlarmClock.EXTRA_HOUR, calendar.HOUR);
+        setAlarm.putExtra(AlarmClock.EXTRA_MINUTES, calendar.MINUTE);
+        //in the morning;
+        setAlarm.putExtra(AlarmClock.EXTRA_IS_PM, false);
+        startActivity(setAlarm);
+        return;
 
+    }
     public static class CalEvent
     {
         String title;
@@ -138,7 +171,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    /*
+
     private final LocationListener listener = new LocationListener() {
 
         @Override
@@ -154,5 +187,5 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     };
 
     LocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000000, 100, listener);
-    */
+
 }
