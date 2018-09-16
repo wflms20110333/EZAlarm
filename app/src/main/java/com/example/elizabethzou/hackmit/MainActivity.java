@@ -23,10 +23,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
-import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
@@ -51,17 +49,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     //Button button2; //button for alarm
     Long time = null; //time for earliest event
-    Long prelay = new Long("18000000"); //default morning routine time
+    int prelayMinutes = 30;
+    long prelay = prelayMinutes * SECONDS_PER_MINUTE * MILLISECONDS_PER_SECOND;
     String filename = Environment.getExternalStoragePublicDirectory(DIRECTORY_DOWNLOADS)+"/Elizabeth_bot.txt";
     File file = new File(filename);
     OutputStreamWriter osw;
     InputStreamReader isr;  //file stuff
 
     Long toKill;
-    Double ax = 42.336601;
-    Double ay = -71.078771;
-    Double bx = 42.461651;
-    Double by = -71.222698;
 
     protected LocationManager locationManager;
     protected double latitude, longitude;
@@ -69,17 +64,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        Integer x = getTime(ax,ay,bx,by, new Long("1509390000000"));
-        Log.i("Timetest", x.toString());
         setContentView(R.layout.activity_main);
         findViewById(R.id.button).setOnClickListener(this);
         findViewById(R.id.button2).setOnClickListener(this);
         findViewById(R.id.submit).setOnClickListener(this);
-
-
-        button2 = (Button) findViewById(R.id.button);
-        button2.setOnClickListener(this);
         //initialize file;
         try  {
             if (!file.exists())  {
@@ -104,31 +92,33 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     //-------------------------CALENDAR COMPONENTS--------------------------
 
     /**
-     * Represents a Calendar Event, storing the title, start minute, and location.
+     * Represents a Calendar Event, storing the title, start minute, location, and day in millis.
      */
     public static class CalEvent implements Comparable<CalEvent>
     {
         String title;
-        int start;
+        int startMinute;
         String location;
+        long startMillis;
 
-        public CalEvent(String a, int b, String c)
+        public CalEvent(String a, int b, String c, long d)
         {
             title = a;
-            start = b;
+            startMinute = b;
             location = c;
+            startMillis = d + startMinute * SECONDS_PER_MINUTE * MILLISECONDS_PER_DAY;
         }
 
         @Override
         public String toString()
         {
-            return title + ": " + start + ", " + location;
+            return title + ": " + startMinute + ", " + location;
         }
 
         @Override
         public int compareTo(CalEvent o)
         {
-            return this.start - o.start;
+            return this.startMinute - o.startMinute;
         }
     }
 
@@ -162,13 +152,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 String location = instancesCursor.getString(id_5);
                 if (startDay != currDay || startMinute <= 0 && endMinute >= 1440)
                     continue;
-                events.add(new CalEvent(title, startMinute, location));
+                events.add(new CalEvent(title, startMinute, location, start));
             }
         }
         Collections.sort(events);
         Log.i("getEarliestEvent", "lol " + events);
         for (CalEvent e : events)
-            if (start + e.start * SECONDS_PER_MINUTE * MILLISECONDS_PER_SECOND > System.currentTimeMillis())
+            if (e.startMillis > System.currentTimeMillis())
                 return e;
         return null;
     }
@@ -219,12 +209,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     {
         switch (v.getId()) {
             case R.id.button: {
-
                 Calendar c = Calendar.getInstance();
                 setToMidnight(c);
-                getEarliestEvent(c);
-
-
+                CalEvent event = getEarliestEvent(c);
+                setAlarm(event.title, event.location, event.startMillis);
+                /*
                 if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_CALENDAR) != PackageManager.PERMISSION_GRANTED) {
                     Log.i("didnotpasstest", "rip");
                     return;
@@ -249,17 +238,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         Toast.makeText(this, "Event is not present.", Toast.LENGTH_SHORT).show();
                     }
                 }
+                */
                 break;
             }
             case R.id.submit: {
                 String txt = ((EditText) findViewById(R.id.input)).getText().toString();
                 ((EditText) findViewById(R.id.input)).setText("");
                 try {
-                    int numMinutes = Integer.parseInt(txt);
-                    Toast.makeText(this, "Yay! You entered: " + numMinutes, Toast.LENGTH_SHORT).show();
+                    prelayMinutes = Integer.parseInt(txt);
+                    Toast.makeText(this, "Yay! You entered: " + prelayMinutes, Toast.LENGTH_SHORT).show();
+                    prelay = prelayMinutes * SECONDS_PER_MINUTE * MILLISECONDS_PER_SECOND;
+                    ((TextView) findViewById(R.id.prelayDisplay)).setText("Morning routine: " + prelayMinutes + " minutes");
                 } catch (Exception e) {
                     Toast.makeText(this, "Please enter a valid integer.", Toast.LENGTH_SHORT).show();
                 }
+                break;
             }
         }
     }
@@ -356,10 +349,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     //-------------------------ALARM COMPONENTS-------------------------
 
-    //calculate time to set alarm
-    public Long calculateTime(Long time)
+    /**
+     * Given a destination and an arrival time, sets an appropriately timed alarm.
+     * @param title the title of the event to attend
+     * @param destination the destination
+     * @param arrivalTime the target arrival time
+     */
+    public void setAlarm(String title, String destination, long arrivalTime)
     {
-        return time - prelay; //TODO: discretion
+        String[] arr = destination.split("[,\\s]+");
+        String arg = arr[0];
+        for (int i = 1; i < arr.length; i++)
+            arg += "+" + arr[i];
+        long startTime = getTravelTime(latitude, longitude, arg, arrivalTime) * MILLISECONDS_PER_SECOND;
+        startTime -= prelay;
+        time = startTime;
+        makeAlarm(title, startTime);
     }
 
     public void killAlarm(String title)
@@ -387,8 +392,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         Boolean permission = ActivityCompat.checkSelfPermission(this, Manifest.permission.SET_ALARM) != PackageManager.PERMISSION_GRANTED;
         Boolean calenderSet = time == null;
-        if (permission || calenderSet) {
-            Log.i("didnotpasstest", "rip");
+        if (permission) {
+            Log.i("makeAlarm", "did not get permission");
             return;
         }
         Log.i("passedTest", "Setting Alarm");
@@ -408,7 +413,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Record rc = new Record(title, millis);
         startActivity(setAlarm);
 
-        if (!toKill.equals(millis))
+        if (toKill != null && !toKill.equals(millis))
         {
             Log.i("???", ((Long)(millis - toKill)).toString());
             eraseAlarm = new Intent();
@@ -425,20 +430,28 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         try {
             wait(1000);
         }
-        catch (Exception e){
-
-        }
+        catch (Exception e){}
         putRecord(rc);
     }
-    //--------------------------------------------------------
+
+    //-------------------------HTTP REQUEST COMPONENTS-------------------------
     String filename2 = Environment.getExternalStoragePublicDirectory(DIRECTORY_DOWNLOADS)+"/Elizabeth_bot2.txt";
     final File file2 = new File(filename2);
-    public int getTime(Double ax, Double ay, Double bx, Double by, Long milli)
+
+    /**
+     * Returns the time to travel from origin to destination in seconds.
+     * @param ax latitude of origin
+     * @param ay longitude of origin
+     * @param b destination
+     * @param milli target arrival time
+     * @return the travel time in seconds.
+     */
+    public int getTravelTime(Double ax, Double ay, String b, Long milli)
     {
         //Begging from google
         final String header = "https://maps.googleapis.com/maps/api/distancematrix/json?";
         final String coordinates = "origins=" + ax.toString() + "," + ay.toString() + "&";
-        final String destination = "destinations=" + bx.toString() + "," + by.toString() + "&";
+        final String destination = "destinations=" + b + "&";
         final String arrival = "arrival_time=" + milli.toString() + "&";
         final String key = "key=AIzaSyCHSMvX0SIHPK-cEEeIoYu_S__Ejctr3zg";
         final String url = header + coordinates + destination + arrival + key;
@@ -458,7 +471,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 public void run() {
                     String resp;
                     try {
-                       resp = getHTML(url);
+                        resp = getHTML(url);
                         PrintWriter pt = new PrintWriter(file2);
                         pt.write(resp);
                         pt.close(); //print new records& erase existing ones
@@ -495,7 +508,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         return 0;
     }
-    public static String getHTML(String urlToRead) throws Exception {
+
+    public static String getHTML(String urlToRead) throws Exception
+    {
         StringBuilder result = new StringBuilder();
         URL url = new URL(urlToRead);
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
