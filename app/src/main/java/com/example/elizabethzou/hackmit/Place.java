@@ -55,5 +55,3 @@ public class Place{
 
     locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000000, 100, listener);
 }
-
-
