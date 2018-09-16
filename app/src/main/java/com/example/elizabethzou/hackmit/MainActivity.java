@@ -20,6 +20,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -215,8 +216,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     return;
                 }
                 Log.i("passedTest", "hey");
-                cursor = getContentResolver().query(Uri.parse("content://com.android.calendar/calendars"), null, null, null, null);
-                cursor = getContentResolver().query(CalendarContract.Events.CONTENT_URI, null, null, null, null);
+                //cursor = getContentResolver().query(Uri.parse("content://com.android.calendar/calendars"), null, null, null, null);
+                Cursor cursor = getContentResolver().query(CalendarContract.Events.CONTENT_URI, null, null, null, null);
                 while (cursor.moveToNext()) {
                     if (cursor != null) {
                         int id_2 = cursor.getColumnIndex(CalendarContract.Events.TITLE);
