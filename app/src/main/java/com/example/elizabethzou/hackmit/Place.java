@@ -1,11 +1,17 @@
 package com.example.elizabethzou.hackmit;
+
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
 import android.location.LocationProvider;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
+import android.os.Message;
+import android.provider.Settings;
 
+/*
 public class Place{
     LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
     LocationProvider provider = locationManager.getProvider(LocationManager.GPS_PROVIDER);
@@ -58,3 +64,4 @@ public class Place{
 
     mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000000, 100, listener);
 }
+*/
