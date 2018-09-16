@@ -89,6 +89,38 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+
+    //-------------------------CALENDAR COMPONENTS--------------------------
+
+    /**
+     * Represents a Calendar Event, storing the title, start minute, and location.
+     */
+    public static class CalEvent implements Comparable<CalEvent>
+    {
+        String title;
+        int start;
+        String location;
+
+        public CalEvent(String a, int b, String c)
+        {
+            title = a;
+            start = b;
+            location = c;
+        }
+
+        @Override
+        public String toString()
+        {
+            return title + ": " + start + ", " + location;
+        }
+
+        @Override
+        public int compareTo(CalEvent o)
+        {
+            return this.start - o.start;
+        }
+    }
+
     /**
      * Returns the earliest event of a day.
      * @param day the day in question, with time set to midnight.
@@ -139,6 +171,35 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         c.set(Calendar.MILLISECOND, 0);
     }
 
+
+    //-------------------------LOCATION COMPONENTS--------------------------
+
+    @Override
+    public void onLocationChanged(Location location) {
+        latitude = location.getLatitude();
+        longitude = location.getLongitude();
+        TextView txtLat = (TextView) findViewById(R.id.textview1);
+        txtLat.setText("Latitude:" + latitude + ", Longitude:" + longitude);
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+        Log.d("Latitude","disable");
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+        Log.d("Latitude","enable");
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+        Log.d("Latitude","status");
+    }
+
+
+    //-------------------------ON CLICK--------------------------
+
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -177,7 +238,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+
     //-------------------------FILE COMPONENTS--------------------------
+
     public class Record
     {
         String title;
@@ -264,7 +327,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return null;
     }
 
+
     //-------------------------ALARM COMPONENTS-------------------------
+
     //calculate time to set alarm
     public Long calculateTime(Long time)
     {
@@ -288,8 +353,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         //postponed
     }
-
-
+    
     //setAlarm
     public void makeAlarm(String title, Long millis)
     {
@@ -339,59 +403,5 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         }
         putRecord(rc);
-
-
-    }
-
-    /**
-     * Represents a Calendar Event, storing the title, start minute, and location.
-     */
-    public static class CalEvent implements Comparable<CalEvent>
-    {
-        String title;
-        int start;
-        String location;
-
-        public CalEvent(String a, int b, String c)
-        {
-            title = a;
-            start = b;
-            location = c;
-        }
-
-        @Override
-        public String toString()
-        {
-            return title + ": " + start + ", " + location;
-        }
-
-        @Override
-        public int compareTo(CalEvent o)
-        {
-            return this.start - o.start;
-        }
-    }
-
-    @Override
-    public void onLocationChanged(Location location) {
-        latitude = location.getLatitude();
-        longitude = location.getLongitude();
-        TextView txtLat = (TextView) findViewById(R.id.textview1);
-        txtLat.setText("Latitude:" + latitude + ", Longitude:" + longitude);
-    }
-
-    @Override
-    public void onProviderDisabled(String provider) {
-        Log.d("Latitude","disable");
-    }
-
-    @Override
-    public void onProviderEnabled(String provider) {
-        Log.d("Latitude","enable");
-    }
-
-    @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
-        Log.d("Latitude","status");
     }
 }
