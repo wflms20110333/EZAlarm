@@ -7,15 +7,9 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 
 public class Place{
-    LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-    LocationProvider provider = locationManager.getProvider(LocationManager.GPS_PROVIDER);
-
-
     public static void Run() {
         protected void onStart(){
             super.onStart();
-            LocationManager locationManager =
-                    LocationManager.getSystemService(Context.LOCATION_SERVICE);
             final boolean gpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
 
             if (!gpsEnabled) {
@@ -36,6 +30,9 @@ public class Place{
                 AlertDialog dialog = enableLocation.create();
                 dialog.show();
             }
+
+            LocationManager locationManager = (LocationManager) context.getSystemService(LOCATION_SERVICE);
+            LocationProvider provider = locationManager.getProvider(LocationManager.GPS_PROVIDER);
         }
     }
 
@@ -55,5 +52,5 @@ public class Place{
         }
     };
 
-    mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000000, 100, listener);
+    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000000, 100, listener);
 }
