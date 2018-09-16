@@ -23,11 +23,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -54,6 +58,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     InputStreamReader isr;  //file stuff
 
     Long toKill;
+    Double ax = 42.336601;
+    Double ay = -71.078771;
+    Double bx = 42.461651;
+    Double by = -71.222698;
 
     protected LocationManager locationManager;
     protected double latitude, longitude;
@@ -61,9 +69,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Integer x = getTime(ax,ay,bx,by, new Long("1509390000000"));
+        Log.i("Timetest", x.toString());
         setContentView(R.layout.activity_main);
         findViewById(R.id.button).setOnClickListener(this);
-        button2 = (Button) findViewById(R.id.button2);
+        button2 = (Button) findViewById(R.id.button);
         button2.setOnClickListener(this);
         //initialize file;
         try  {
@@ -403,5 +414,82 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         }
         putRecord(rc);
+    }
+    //--------------------------------------------------------
+    String filename2 = Environment.getExternalStoragePublicDirectory(DIRECTORY_DOWNLOADS)+"/Elizabeth_bot2.txt";
+    final File file2 = new File(filename2);
+    public int getTime(Double ax, Double ay, Double bx, Double by, Long milli)
+    {
+        //Begging from google
+        final String header = "https://maps.googleapis.com/maps/api/distancematrix/json?";
+        final String coordinates = "origins=" + ax.toString() + "," + ay.toString() + "&";
+        final String destination = "destinations=" + bx.toString() + "," + by.toString() + "&";
+        final String arrival = "arrival_time=" + milli.toString() + "&";
+        final String key = "key=AIzaSyCHSMvX0SIHPK-cEEeIoYu_S__Ejctr3zg";
+        final String url = header + coordinates + destination + arrival + key;
+        try  {
+            if (!file2.exists())  {
+                Boolean bool = file2.createNewFile();
+                if (!bool) throw new Exception("File Creation Fail");
+            }
+        }
+        catch (Exception e)  {
+            Log.i("Error", e.getMessage());
+        }
+        try
+        {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    String resp;
+                    try {
+                       resp = getHTML(url);
+                        PrintWriter pt = new PrintWriter(file2);
+                        pt.write(resp);
+                        pt.close(); //print new records& erase existing ones
+                    }
+                    catch (Exception e) {
+                        //
+                    }
+                }
+            }).start();
+        }
+        catch (Exception e)
+        {
+            Log.i("Sorry", "" + e.toString());
+        }
+        //read back from file
+        try {
+            FileInputStream fIn = new FileInputStream(file2);
+            isr = new InputStreamReader(fIn);
+            BufferedReader in = new BufferedReader(isr);
+            //casting
+            String str;
+            str = in.readLine();
+            int pos = str.indexOf("duration");
+            String newstr = str.substring(pos);
+            int pos1 = newstr.indexOf("value");
+            int i = pos1;
+            while (newstr.charAt(i) < '0' || newstr.charAt(i) > '9') i++;
+            int j = i;
+            while (newstr.charAt(j) >= '0' && newstr.charAt(j) <= '9') j++;
+            return Integer.parseInt(newstr.substring(i,j));
+        }
+        catch (Exception e) {
+            //
+        }
+        return 0;
+    }
+    public static String getHTML(String urlToRead) throws Exception {
+        StringBuilder result = new StringBuilder();
+        URL url = new URL(urlToRead);
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+        String line;
+        while ((line = rd.readLine()) != null) {
+            result.append(line);
+        }
+        rd.close();
+        return result.toString();
     }
 }
