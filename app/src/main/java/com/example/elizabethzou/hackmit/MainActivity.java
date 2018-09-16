@@ -31,6 +31,10 @@ import static android.provider.AlarmClock.ACTION_SET_ALARM;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, LocationListener {
 
     public static long MILLISECONDS_PER_DAY = 86400000L;
+    public static long MILLISECONDS_PER_SECOND = 1000L;
+    public static long SECONDS_PER_MINUTE = 60L;
+    public static long UTC_TO_EDT = -14400L;
+
     Button button2; //button for alarm
     Long time = null; //time for earliest event
     Long prelay = new Long("18000000"); //default morning routine time
@@ -76,7 +80,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         List<CalEvent> events = new ArrayList<>();
         long start = day.getTimeInMillis();
         long end = start + MILLISECONDS_PER_DAY;
-        long currDay = Time.getJulianDay(start, -14400);
+        long currDay = Time.getJulianDay(start, UTC_TO_EDT);
         Uri myUri = Uri.parse("content://com.android.calendar/instances/when/" + start + "/" + end);
         Cursor instancesCursor = getContentResolver().query(myUri, null, null, null, null);
         while (instancesCursor.moveToNext()) {
@@ -98,7 +102,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         Collections.sort(events);
         Log.i("rip", "lol " + events);
-        return events.isEmpty() ? null: events.get(0);
+        for (CalEvent e : events)
+            if (start + e.start * SECONDS_PER_MINUTE * MILLISECONDS_PER_SECOND > System.currentTimeMillis())
+                return e;
+        return null;
     }
 
     /**
