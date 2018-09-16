@@ -12,10 +12,10 @@ public class Place{
 
 
     public static void Run() {
-        protected void onStart() {
+        protected void onStart(){
             super.onStart();
             LocationManager locationManager =
-                    (LocationManager).getSystemService(Context.LOCATION_SERVICE);
+                    LocationManager.getSystemService(Context.LOCATION_SERVICE);
             final boolean gpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
 
             if (!gpsEnabled) {
@@ -43,7 +43,7 @@ public class Place{
 
     private final LocationListener listener = new LocationListener() {
 
-        @Override
+        // @Override
         public void onLocationChanged(Location location) {
             // A new location update is received.  Do something useful with it.  In this case,
             // we're sending the update to a handler which then updates the UI with the new
@@ -56,8 +56,4 @@ public class Place{
     };
 
     mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000000, 100, listener);
-
-    public static int findTime(Location currentPlace, Location eventPlace) {
-
-    }
 }
