@@ -56,4 +56,8 @@ public class Place{
     };
 
     mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000000, 100, listener);
+
+    public static int findTime(Location currentPlace, Location eventPlace) {
+
+    }
 }
