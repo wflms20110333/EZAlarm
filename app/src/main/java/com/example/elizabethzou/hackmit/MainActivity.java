@@ -56,13 +56,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     Long toKill;
 
     protected LocationManager locationManager;
-    protected LocationListener locationListener;
-    protected Context context;
-    //TextView txtLat;
-    //String lat;
-    //String provider;
     protected double latitude, longitude;
-    //protected boolean gps_enabled, network_enabled;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,12 +73,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         }
         catch (Exception e)  {
-            //TODO: push appropriate alarm message;
             Log.i("Error", e.getMessage());
         }
-        //erase existing
 
-        //txtLat = (TextView) findViewById(R.id.textview1);
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
@@ -160,7 +151,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         }
         Collections.sort(events);
-        Log.i("rip", "lol " + events);
+        Log.i("getEarliestEvent", "lol " + events);
         for (CalEvent e : events)
             if (start + e.start * SECONDS_PER_MINUTE * MILLISECONDS_PER_SECOND > System.currentTimeMillis())
                 return e;
@@ -209,7 +200,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     //-------------------------ON CLICK--------------------------
 
     @Override
-    public void onClick(View v) {
+    public void onClick(View v)
+    {
         switch (v.getId()) {
             case R.id.button: {
 
@@ -235,7 +227,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         time = calculateTime(Long.parseLong(startValue));
                         String endValue = cursor.getString(id_6);
                         Toast.makeText(this, startValue, Toast.LENGTH_SHORT).show();
-                        makeAlarm(titleValue, time);
+                        //makeAlarm(titleValue, time);
                         Toast.makeText(this, titleValue + ", " + startValue + ", " + endValue, Toast.LENGTH_SHORT).show();
                         break;
                     } else {
