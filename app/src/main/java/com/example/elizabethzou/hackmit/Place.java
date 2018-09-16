@@ -8,7 +8,6 @@ import android.content.DialogInterface;
 import android.support.v4.app.FragmentActivity;
 
 /*
-public class Place{
 public class Place extends FragmentActivity{
     // public static void Run() {
     LocationManager locationManager;
