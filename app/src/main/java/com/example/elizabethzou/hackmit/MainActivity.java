@@ -16,6 +16,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -25,6 +26,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
+import static android.provider.AlarmClock.ACTION_DISMISS_ALARM;
 import static android.provider.AlarmClock.ACTION_SET_ALARM;
 import java.util.ArrayList;
 import java.util.Date;
@@ -42,6 +44,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     File file = new File(filename);
     OutputStreamWriter osw;
     InputStreamReader isr;  //file stuff
+    Record[] records = new Record[0];
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,8 +62,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
             FileOutputStream fOut = openFileOutput(filename, MODE_PRIVATE);
             osw = new OutputStreamWriter(fOut);
-            FileInputStream fIn = openFileInput(filename);
-            isr = new InputStreamReader(fIn);
             //TODO: remove set alarm;
         }
         catch (Exception e)  {
@@ -100,7 +101,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         String descriptionValue = cursor.getString(id_3);
                         String eventValue = cursor.getString(id_4);
                         String startValue = cursor.getString(id_5);
-                        time = Long.parseLong(startValue);
+                        time = calculateTime(Long.parseLong(startValue));
                         String endValue = cursor.getString(id_6);
                         Toast.makeText(this, startValue, Toast.LENGTH_SHORT).show();
                         //String descriptionValue = cursor.getString(id_3);
@@ -121,13 +122,82 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
 
             case R.id.button2:
-                setAlarm(time - prelay);
+                setAlarm(time);
         }
     }
-    public class Message
+    //-------------------------FILE COMPONENTS--------------------------
+    public class Record
     {
-        
+        String title;
+        Long millis;
+        String valid;
+        public Record(String title, Long millis)
+        {
+            this.title = title.replaceAll(" ", "_"); //erase spaces to avoid trouble
+            this.millis = millis;
+        }
     }
+
+    public void putRecord(Record r)
+    {
+        try
+        {
+            osw.write(r.title + " " + r.millis.toString() + " " + "Y" + "\n");
+        }
+        catch (Exception e)
+        {
+            //TODO: push error message
+        }
+    }
+
+    public Long retrieveTime(String title)  {
+        try
+        {
+            String goal = title.replace(" ","_")
+            FileInputStream fIn = openFileInput(filename);
+            isr = new InputStreamReader(fIn);
+            BufferedReader in = new BufferedReader(isr);
+            String str = new String();
+            while ((str = in.readLine()) != null)  //read until EOF
+            {
+                 String[] str1 = str.split(" ");
+                 if (str1[0].equals(goal))
+                 {
+                     return Long.parseLong(str1[1])
+                 }
+            }
+        }
+        catch (Exception e)
+        {
+            //TODO: push error message
+        }
+    }
+    //-------------------------ALARM COMPONENTS-------------------------
+    //calculate time to set alarm
+    public Long calculateTime(Long time)
+    {
+        return time - prelay; //TODO: discretion
+    }
+
+    //erase alarm given time
+    public void eraseAlarm(Long millis)  {
+        Boolean permission = ActivityCompat.checkSelfPermission(this, Manifest.permission.SET_ALARM) != PackageManager.PERMISSION_GRANTED;
+        Boolean calenderSet = time == null;
+        if (permission || calenderSet) {
+            Log.i("didnotpasstest", "rip");
+            return;
+        }
+        Intent eraseAlarm = new Intent();
+        Calendar calendar = new GregorianCalendar();
+        calendar.setTimeInMillis(millis);
+        eraseAlarm.setAction(ACTION_DISMISS_ALARM);
+        eraseAlarm.putExtra(AlarmClock.EXTRA_HOUR, calendar.HOUR);
+        eraseAlarm.putExtra(AlarmClock.EXTRA_MINUTES, calendar.MINUTE);
+        eraseAlarm.putExtra(AlarmClock.EXTRA_IS_PM, false);
+        startActivity(eraseAlarm);
+    }
+
+    //setAlarm
     public void setAlarm(Long millis)
     {
         Boolean permission = ActivityCompat.checkSelfPermission(this, Manifest.permission.SET_ALARM) != PackageManager.PERMISSION_GRANTED;
@@ -136,6 +206,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Log.i("didnotpasstest", "rip");
             return;
         }
+        //TODO:search for existing alarm
         Log.i("passedTest", "Setting Alarm");
         Intent setAlarm = new Intent();
         //setAlarm;
