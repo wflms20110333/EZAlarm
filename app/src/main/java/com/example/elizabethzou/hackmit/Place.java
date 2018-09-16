@@ -7,33 +7,32 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 
 public class Place{
-    public static void Run() {
-        protected void onStart(){
-            super.onStart();
-            final boolean gpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+    // public static void Run() {
+    protected void onStart(){
+        super.onStart();
+        final boolean gpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
 
-            if (!gpsEnabled) {
-                AlertDialog.Builder enableLocation = new AlertDialog.Builder(get(Activity()));
-                enableLocation.setMessage("Location services not currently enabled. Enable?");
-                enableLocation.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
+        if (!gpsEnabled) {
+            AlertDialog.Builder enableLocation = new AlertDialog.Builder(get(Activity()));
+            enableLocation.setMessage("Location services not currently enabled. Enable?");
+            enableLocation.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
 //help I don't know how activities work
-                        activity.startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
-                        dialog.dismiss();
+                    activity.startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                    dialog.dismiss();
+                }
+            });
+            enableLocation.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    dialog.cancel();
                     }
-                });
-                enableLocation.setNegativeButton("No", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        dialog.cancel();
-                    }
-                });
-                AlertDialog dialog = enableLocation.create();
-                dialog.show();
-            }
-
-            LocationManager locationManager = (LocationManager) context.getSystemService(LOCATION_SERVICE);
-            LocationProvider provider = locationManager.getProvider(LocationManager.GPS_PROVIDER);
+            });
+            AlertDialog dialog = enableLocation.create();
+            dialog.show();
         }
+
+        LocationManager locationManager = (LocationManager) context.getSystemService(LOCATION_SERVICE);
+        LocationProvider provider = locationManager.getProvider(LocationManager.GPS_PROVIDER);
     }
 
     //Location should be enabled now
