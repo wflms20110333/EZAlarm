@@ -17,7 +17,6 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.format.Time;
 import android.util.Log;
-import android.view.Display;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -25,7 +24,6 @@ import android.widget.TextView;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
@@ -38,11 +36,6 @@ import java.util.List;
 import static android.os.Environment.DIRECTORY_DOWNLOADS;
 import static android.provider.AlarmClock.ACTION_DISMISS_ALARM;
 import static android.provider.AlarmClock.ACTION_SET_ALARM;
-import static java.lang.Thread.sleep;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, LocationListener {
 
@@ -54,6 +47,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     File file = new File(filename);
     OutputStreamWriter osw;
     InputStreamReader isr;  //file stuff
+
+    Long toKill;
 
     protected LocationManager locationManager;
     protected LocationListener locationListener;
@@ -148,6 +143,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.button: {
+
+                Calendar c = Calendar.getInstance();
+                setToMidnight(c);
+                getEarliestEvent(c);
+
+
                 if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_CALENDAR) != PackageManager.PERMISSION_GRANTED) {
                     Log.i("didnotpasstest", "rip");
                     return;
@@ -157,36 +158,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 cursor = getContentResolver().query(CalendarContract.Events.CONTENT_URI, null, null, null, null);
                 while (cursor.moveToNext()) {
                     if (cursor != null) {
-                        //int id_1 = cursor.getColumnIndex(CalendarContract.Instances.TITLE);
-                        //int id_2 = cursor.getColumnIndex(CalendarContract.Instances.BEGIN);
-                        //String title = cursor.getString(id_1);
-                        //Date start = new Date(Long.parseLong(cursor.getString(id_2)));
-                        //events.add(new CalEvent(title, start));
-
-                        //int id_1 = cursor.getColumnIndex(CalendarContract.Events._ID);
                         int id_2 = cursor.getColumnIndex(CalendarContract.Events.TITLE);
-                        //int id_3 = cursor.getColumnIndex(CalendarContract.Events.DESCRIPTION);
-                        //int id_4 = cursor.getColumnIndex(CalendarContract.Events.EVENT_LOCATION);
                         int id_5 = cursor.getColumnIndex(CalendarContract.Events.DTSTART);
                         int id_6 = cursor.getColumnIndex(CalendarContract.Events.DTEND);
-                        //String idValue = cursor.getColumnName(id_1);
                         String titleValue = cursor.getString(id_2);
-                        //String descriptionValue = cursor.getString(id_3);
-                        //String eventValue = cursor.getString(id_4);
                         String startValue = cursor.getString(id_5);
                         time = calculateTime(Long.parseLong(startValue));
                         String endValue = cursor.getString(id_6);
                         Toast.makeText(this, startValue, Toast.LENGTH_SHORT).show();
                         makeAlarm(titleValue, time);
-                        //String descriptionValue = cursor.getString(id_3);
-                        //String eventValue = cursor.getString(id_4);
-                        //Date startValue = new Date(Long.parseLong(cursor.getString(id_5)));
-                        //Date endValue = new Date(Long.parseLong(cursor.getString(id_6)));
-                        //events.add(new CalEvent(titleValue, startValue, endValue));
                         Toast.makeText(this, titleValue + ", " + startValue + ", " + endValue, Toast.LENGTH_SHORT).show();
-                        //Log.i("title", "lol " + titleValue);
-                        //Log.i("dtstart", "lol " + startValue);
-                        //Log.i("dtend", "lol " + endValue);
                         break;
                     } else {
                         Toast.makeText(this, "Event is not present.", Toast.LENGTH_SHORT).show();
@@ -195,16 +176,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         }
     }
+
     //-------------------------FILE COMPONENTS--------------------------
     public class Record
     {
         String title;
         Long millis;
+
         public Record(String title, Long millis)
         {
             this.title = title.replaceAll(" ", "_"); //erase spaces to avoid trouble
             this.millis = millis;
         }
+
         @Override
         public String toString()
         {
@@ -225,7 +209,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             //TODO: push error message
         }
     }
-    Long toKill;
+
     public void killAll()
     {
         try
@@ -252,8 +236,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Log.i("Error",e.getMessage());//TODO: push error message
         }
     }
+
     //API for Elizabeth
-    public Long retrieveTime(String title)  {
+    public Long retrieveTime(String title)
+    {
         try
         {
             String goal = title.replace(" ","_");
@@ -277,6 +263,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         return null;
     }
+
     //-------------------------ALARM COMPONENTS-------------------------
     //calculate time to set alarm
     public Long calculateTime(Long time)
@@ -291,14 +278,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     //erase alarm given time
     Intent eraseAlarm;
 
-    public void killAlarm(Long millis)  {
+    public void killAlarm(Long millis)
+    {
         Boolean permission = ActivityCompat.checkSelfPermission(this, Manifest.permission.SET_ALARM) != PackageManager.PERMISSION_GRANTED;
         Boolean calenderSet = time == null;
         if (permission || calenderSet) {
             Log.i("didnotpasstest", "rip");
             return;
         }
-
         //postponed
     }
 
@@ -354,38 +341,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         putRecord(rc);
 
 
-    }
-}
-            case R.id.button:
-                Calendar c = Calendar.getInstance();
-                setToMidnight(c);
-                getEarliestEvent(c);
-                break;
-
-            case R.id.button2:
-                Boolean permission = ActivityCompat.checkSelfPermission(this, Manifest.permission.SET_ALARM) != PackageManager.PERMISSION_GRANTED;
-                Boolean calenderSet = time == null;
-                if (permission || calenderSet) {
-                    Log.i("didnotpasstest", "rip");
-                    return;
-                }
-                Log.i("passedTest", "Setting Alarm");
-                Intent setAlarm = new Intent();
-                //setAlarm;
-                setAlarm.setAction(ACTION_SET_ALARM);
-                setAlarm.setData(null);
-                //don't show UI
-                setAlarm.putExtra(AlarmClock.EXTRA_SKIP_UI, true);
-                //calculate Date
-                Calendar calendar = new GregorianCalendar();
-                calendar.setTimeInMillis(time - prelay);
-                setAlarm.putExtra(AlarmClock.EXTRA_HOUR, calendar.HOUR);
-                setAlarm.putExtra(AlarmClock.EXTRA_MINUTES, calendar.MINUTE);
-                //in the morning;
-                setAlarm.putExtra(AlarmClock.EXTRA_IS_PM, false);
-                startActivity(setAlarm);
-                break;
-        }
     }
 
     /**
