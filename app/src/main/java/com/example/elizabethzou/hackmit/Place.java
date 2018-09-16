@@ -1,16 +1,5 @@
 package com.example.elizabethzou.hackmit;
 
-import android.app.AlertDialog;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
-import android.location.LocationProvider;
-import android.os.Message;
-import android.provider.Settings;
-
 /*
 public class Place{
     // public static void Run() {
@@ -58,12 +47,6 @@ public class Place{
                             location.getLongitude()).sendToTarget();
         }
     };
-
-<<<<<<< HEAD
-    mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000000, 100, listener);
-}
-*/
-=======
     locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000000, 100, listener);
 }
->>>>>>> e204225fda5a4185c3c799e9b2580bd9e16cf599
+*/
