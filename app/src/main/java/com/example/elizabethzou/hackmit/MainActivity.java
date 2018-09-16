@@ -16,14 +16,12 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-
-import static android.provider.AlarmClock.ACTION_SET_ALARM;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.List;
+
+import static android.provider.AlarmClock.ACTION_SET_ALARM;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -73,13 +71,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         int id_2 = instancesCursor.getColumnIndex(CalendarContract.Instances.START_MINUTE);
                         int id_3 = instancesCursor.getColumnIndex(CalendarContract.Instances.START_DAY);
                         int id_4 = instancesCursor.getColumnIndex(CalendarContract.Instances.END_MINUTE);
+                        int id_5 = instancesCursor.getColumnIndex(CalendarContract.Instances.EVENT_LOCATION);
                         String title = instancesCursor.getString(id_1);
                         int startMinute = Integer.parseInt(instancesCursor.getString(id_2));
                         long startDay = Long.parseLong(instancesCursor.getString(id_3));
                         int endMinute = Integer.parseInt(instancesCursor.getString(id_4));
+                        String location = instancesCursor.getString(id_5);
                         if (startDay != day || startMinute <= 0 && endMinute >= 1440)
                             continue;
-                        events.add(new CalEvent(title, startMinute));
+                        events.add(new CalEvent(title, startMinute, location));
                     } else {
                         Toast.makeText(this, "Event is not present.", Toast.LENGTH_SHORT).show();
                     }
@@ -117,16 +117,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     {
         String title;
         int start;
+        String location;
 
-        public CalEvent(String a, int b)
+        public CalEvent(String a, int b, String c)
         {
             title = a;
             start = b;
+            location = c;
         }
 
         public String toString()
         {
-            return title + ": " + start;
+            return title + ": " + start + ", " + location;
         }
     }
 }
