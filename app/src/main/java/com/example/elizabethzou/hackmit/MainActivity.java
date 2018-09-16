@@ -106,7 +106,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             title = a;
             startMinute = b;
             location = c;
-            startMillis = d + startMinute * SECONDS_PER_MINUTE * MILLISECONDS_PER_DAY;
+            startMillis = d + startMinute * SECONDS_PER_MINUTE * MILLISECONDS_PER_SECOND;
+            Log.i("CalEvent", "title = " + title + ", startMinute = " + startMinute + ", d = " + d + ", startMillis = " + startMillis);
         }
 
         @Override
@@ -156,10 +157,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         }
         Collections.sort(events);
-        Log.i("getEarliestEvent", "lol " + events);
-        for (CalEvent e : events)
-            if (e.startMillis > System.currentTimeMillis())
+        Log.i("all events", "lol " + events);
+        for (CalEvent e : events) {
+            Log.i("getEarliestEvent", "e.startMillis = " + e.startMillis + ", current = " + System.currentTimeMillis());
+            Log.i("gee: title", "title = " + e.title);
+            if (e.startMillis + UTC_TO_EDT > System.currentTimeMillis())
                 return e;
+        }
         return null;
     }
 
@@ -209,36 +213,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     {
         switch (v.getId()) {
             case R.id.button: {
+                Log.i("looool", "rip");
                 Calendar c = Calendar.getInstance();
                 setToMidnight(c);
                 CalEvent event = getEarliestEvent(c);
                 setAlarm(event.title, event.location, event.startMillis);
-                /*
-                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_CALENDAR) != PackageManager.PERMISSION_GRANTED) {
-                    Log.i("didnotpasstest", "rip");
-                    return;
-                }
-                Log.i("passedTest", "hey");
-                //cursor = getContentResolver().query(Uri.parse("content://com.android.calendar/calendars"), null, null, null, null);
-                Cursor cursor = getContentResolver().query(CalendarContract.Events.CONTENT_URI, null, null, null, null);
-                while (cursor.moveToNext()) {
-                    if (cursor != null) {
-                        int id_2 = cursor.getColumnIndex(CalendarContract.Events.TITLE);
-                        int id_5 = cursor.getColumnIndex(CalendarContract.Events.DTSTART);
-                        int id_6 = cursor.getColumnIndex(CalendarContract.Events.DTEND);
-                        String titleValue = cursor.getString(id_2);
-                        String startValue = cursor.getString(id_5);
-                        time = calculateTime(Long.parseLong(startValue));
-                        String endValue = cursor.getString(id_6);
-                        Toast.makeText(this, startValue, Toast.LENGTH_SHORT).show();
-                        //makeAlarm(titleValue, time);
-                        Toast.makeText(this, titleValue + ", " + startValue + ", " + endValue, Toast.LENGTH_SHORT).show();
-                        break;
-                    } else {
-                        Toast.makeText(this, "Event is not present.", Toast.LENGTH_SHORT).show();
-                    }
-                }
-                */
                 break;
             }
             case R.id.submit: {
@@ -246,7 +225,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 ((EditText) findViewById(R.id.input)).setText("");
                 try {
                     prelayMinutes = Integer.parseInt(txt);
-                    Toast.makeText(this, "Yay! You entered: " + prelayMinutes, Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(this, "Yay! You entered: " + prelayMinutes, Toast.LENGTH_SHORT).show();
                     prelay = prelayMinutes * SECONDS_PER_MINUTE * MILLISECONDS_PER_SECOND;
                     ((TextView) findViewById(R.id.prelayDisplay)).setText("Morning routine: " + prelayMinutes + " minutes");
                 } catch (Exception e) {
@@ -359,8 +338,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     {
         String[] arr = destination.split("[,\\s]+");
         String arg = arr[0];
-        for (int i = 1; i < arr.length; i++)
+        for (int i = 1; i < arr.length; i++) {
+            if (i == arr.length - 1 && arr[i].length() == 5 && arr[i].matches("\\d+"))
+                break;
             arg += "+" + arr[i];
+        }
         long startTime = getTravelTime(latitude, longitude, arg, arrivalTime) * MILLISECONDS_PER_SECOND;
         startTime -= prelay;
         time = startTime;
@@ -388,6 +370,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     //setAlarm
     public void makeAlarm(String title, Long millis)
     {
+        Log.i("makeAlarm", "title = " + title + ", millis = " + millis);
         killAll();
 
         Boolean permission = ActivityCompat.checkSelfPermission(this, Manifest.permission.SET_ALARM) != PackageManager.PERMISSION_GRANTED;
@@ -455,6 +438,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         final String arrival = "arrival_time=" + milli.toString() + "&";
         final String key = "key=AIzaSyCHSMvX0SIHPK-cEEeIoYu_S__Ejctr3zg";
         final String url = header + coordinates + destination + arrival + key;
+        Log.i("url",url);
         try  {
             if (!file2.exists())  {
                 Boolean bool = file2.createNewFile();
@@ -475,9 +459,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         PrintWriter pt = new PrintWriter(file2);
                         pt.write(resp);
                         pt.close(); //print new records& erase existing ones
+                        Log.i("test",resp);
                     }
                     catch (Exception e) {
-                        //
+                        Log.i("Sorry", "" + e.toString());
                     }
                 }
             }).start();
@@ -504,8 +489,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             return Integer.parseInt(newstr.substring(i,j));
         }
         catch (Exception e) {
-            //
+            Log.i("final",e.toString());
         }
+        Log.i("getTravelTime", "U FAILED RIP");
         return 0;
     }
 
