@@ -8,6 +8,8 @@ import android.content.DialogInterface;
 
 public class Place{
     // public static void Run() {
+    LocationManager locationManager;
+    LocationProvider provider;
     protected void onStart(){
         super.onStart();
         final boolean gpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
@@ -31,8 +33,8 @@ public class Place{
             dialog.show();
         }
 
-        LocationManager locationManager = (LocationManager) context.getSystemService(LOCATION_SERVICE);
-        LocationProvider provider = locationManager.getProvider(LocationManager.GPS_PROVIDER);
+        locationManager = (LocationManager) context.getSystemService(LOCATION_SERVICE);
+        provider = locationManager.getProvider(LocationManager.GPS_PROVIDER);
     }
 
     //Location should be enabled now
@@ -53,3 +55,5 @@ public class Place{
 
     locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000000, 100, listener);
 }
+
+
