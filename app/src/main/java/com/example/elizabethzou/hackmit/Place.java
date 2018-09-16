@@ -1,7 +1,14 @@
 package com.example.elizabethzou.hackmit;
+import android.content.Context;
+import android.location.Location;
+import android.location.LocationManager;
+import android.location.LocationProvider;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.support.v4.app.FragmentActivity;
 
 /*
-public class Place{
+public class Place extends FragmentActivity{
     // public static void Run() {
     LocationManager locationManager;
     LocationProvider provider;
