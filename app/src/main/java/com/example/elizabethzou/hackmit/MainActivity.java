@@ -40,6 +40,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //erase existing
     }
 
+    /**
+     * Returns the earliest event of a day.
+     * @param day the day in question, with time set to midnight.
+     * @return the earliest event of the day
+     */
     public CalEvent getEarliestEvent(Calendar day)
     {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_CALENDAR) != PackageManager.PERMISSION_GRANTED)
