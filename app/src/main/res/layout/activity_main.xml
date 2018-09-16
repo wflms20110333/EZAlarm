@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="154dp"
+        android:layout_marginTop="15dp"
         android:text="This is literally here to tell u how stupid u r."
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -24,9 +24,9 @@
         android:id="@+id/button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="125dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignTop="@+id/button2"
+        android:layout_marginStart="34dp"
         android:text="DANIEL UR DUMB" />
 
     <Button
@@ -34,8 +34,33 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="209dp"
+        android:layout_marginBottom="43dp"
+        android:layout_toEndOf="@+id/submit"
         android:text="Alarm Test" />
+
+    <EditText
+        android:id="@+id/input"
+        android:layout_width="165dp"
+        android:layout_height="71dp"
+        android:layout_centerInParent="true" />
+
+    <TextView
+        android:id="@+id/prompt"
+        android:layout_width="301dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="100dp"
+        android:text="Please enter the number of minutes you need to get ready:"
+        android:textSize="30sp" />
+
+    <Button
+        android:id="@+id/submit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="146dp"
+        android:text="Set Alarms!" />
 
 </RelativeLayout>

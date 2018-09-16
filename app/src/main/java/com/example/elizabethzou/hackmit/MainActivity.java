@@ -18,7 +18,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.format.Time;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public static long SECONDS_PER_MINUTE = 60L;
     public static long UTC_TO_EDT = -14400L;
 
-    Button button2; //button for alarm
+    //Button button2; //button for alarm
     Long time = null; //time for earliest event
     Long prelay = new Long("18000000"); //default morning routine time
     String filename = Environment.getExternalStoragePublicDirectory(DIRECTORY_DOWNLOADS)+"/Elizabeth_bot.txt";
@@ -63,8 +63,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         findViewById(R.id.button).setOnClickListener(this);
-        button2 = (Button) findViewById(R.id.button2);
-        button2.setOnClickListener(this);
+        findViewById(R.id.button2).setOnClickListener(this);
+        findViewById(R.id.submit).setOnClickListener(this);
+
+
         //initialize file;
         try  {
             if (!file.exists())  {
@@ -233,6 +235,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     } else {
                         Toast.makeText(this, "Event is not present.", Toast.LENGTH_SHORT).show();
                     }
+                }
+                break;
+            }
+            case R.id.submit: {
+                String txt = ((EditText) findViewById(R.id.input)).getText().toString();
+                ((EditText) findViewById(R.id.input)).setText("");
+                try {
+                    int numMinutes = Integer.parseInt(txt);
+                    Toast.makeText(this, "Yay! You entered: " + numMinutes, Toast.LENGTH_SHORT).show();
+                } catch (Exception e) {
+                    Toast.makeText(this, "Please enter a valid integer.", Toast.LENGTH_SHORT).show();
                 }
             }
         }
