@@ -2,6 +2,8 @@
 
 An android application that sets alarms for users based on their earliest calendar event, morning routine length, and commute time calculated by Google Maps API.
 
+Created at HackMIT 2018.
+
 ## Built With
 
 * [Google Maps API](https://developers.google.com/maps/documentation/) - Google API
